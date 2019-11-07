@@ -1,0 +1,86 @@
+#!/bin/bash
+# Copyright (c) 2017-2019, AT&T Intellectual Property. All rights reserved.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+progname=${0##*/}
+cfgfile=/etc/ssh/vyatta_ssh_config
+
+usage ()
+{
+    echo "Usage for handling of single instance parameters for SSH client:"
+    echo "$progname { update <param> <value> | delete <param> }"
+    exit 1
+}
+
+update_bind ()
+{
+    if [ -f "$cfgfile" ] && grep -q "^[ \t]*$param" $cfgfile
+    then
+        sed -i -E -e "s/(^[ \t]*$param).*/\1 $value/" $cfgfile
+    else
+        echo "    $param $value" >> $cfgfile
+    fi
+}
+
+del_bind ()
+{
+    if [ -f "$cfgfile" ]; then
+        sed -i -e "/^[ \t]*$param/d" "$cfgfile"
+    fi
+}
+
+update_legacy ()
+{
+    vyatta-security-ssh-client-update update-legacy
+}
+
+del_legacy ()
+{
+    vyatta-security-ssh-client-update update-legacy
+}
+
+if [ "$#" -lt 2 ]; then
+    echo "Incorrect argument count"
+    usage
+fi
+
+action=$1
+param=$2
+value=$3
+
+if [ -z "$param" ]; then
+    echo "Parameter argument is empty"
+    usage
+fi
+
+case "$action" in
+    update)
+        if [ -z "$value" ]; then
+             echo "Value argument is empty"
+             usage
+        fi
+        case "$param" in
+            BindInterface)
+                update_bind
+                ;;
+            Legacy)
+                update_legacy
+                ;;
+        esac
+        ;;
+    delete)
+        case "$param" in
+            BindInterface)
+                del_bind
+                ;;
+            Legacy)
+                del_legacy
+                ;;
+        esac
+        ;;
+    *)
+        usage
+;;
+esac

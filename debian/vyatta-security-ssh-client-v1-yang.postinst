@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Copyright (c) 2018-2019 AT&T Intellectual Property.
+# All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-only
+
+/opt/vyatta/sbin/vyatta-security-ssh-client-update defaults

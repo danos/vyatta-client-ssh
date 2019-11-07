@@ -1,0 +1,30 @@
+Source: vyatta-client-ssh
+Section: contrib/net
+Priority: optional
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Build-Depends: cpio, debhelper (>= 9), dh-systemd (>= 1.5), dh-yang
+Standards-Version: 3.9.6
+
+Package: vyatta-security-ssh-client-v1-yang
+Architecture: all
+Depends: python3, vyatta-service-ssh, vyatta-cfg (>= 1.16), ${misc:Depends}, ${yang:Depends}
+Description: vyatta-security-ssh-client-v1 module
+ SSH client configuration
+
+Package: vyatta-security-ssh-known-hosts-v1-yang
+Architecture: all
+Depends: vyatta-service-ssh, vyatta-cfg, ${misc:Depends}, ${yang:Depends}
+Conflicts: vyatta-cfg-system (<< 2.0), vyatta-service-ssh (<< 0.2)
+Replaces: vyatta-cfg-system (<< 2.0), vyatta-service-ssh (<< 0.2)
+Description: vyatta-security-ssh-known-hosts-v1 module
+ SSH known hosts configuration
+
+Package: vyatta-security-ssh-known-hosts-routing-instance-v1-yang
+Architecture: all
+Depends: vyatta-security-ssh-known-hosts-v1-yang, vyatta-cfg, libvyatta-vrfmanager-sh,
+ chvrf, ${misc:Depends}, ${yang:Depends}
+Conflicts: vyatta-cfg-system (<< 2.0), vyatta-service-ssh (<< 0.2)
+Replaces: vyatta-cfg-system (<< 2.0), vyatta-service-ssh (<< 0.2)
+Description: vyatta-security-ssh-known-hosts-routing-instance-v1 module
+ routing-instance SSH known hosts configuration
+

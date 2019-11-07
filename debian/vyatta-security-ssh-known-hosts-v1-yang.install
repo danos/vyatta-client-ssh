@@ -1,0 +1,6 @@
+yang/vyatta-security-ssh-known-hosts-v1.yang usr/share/configd/yang/
+tmplscripts/security/ssh-known-hosts/configd_end.sh /opt/vyatta/share/tmplscripts/security/ssh-known-hosts/
+tmplscripts/security/ssh-known-hosts/host/configd_validate1.cli /opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/
+tmplscripts/security/ssh-known-hosts/host/fetch-from-server/configd_subst1.cli /opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/fetch-from-server/
+tmplscripts/security/ssh-known-hosts/host/key/configd_syntax1.cli /opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/key/
+tmplscripts/security/ssh-known-hosts/host/load-from-file/configd_subst1.cli /opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/load-from-file

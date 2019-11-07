@@ -1,0 +1,121 @@
+module vyatta-security-ssh-client-v1 {
+	namespace "urn:vyatta.com:mgmt:vyatta-security-ssh-client:1";
+	prefix vyatta-security-ssh-client-v1;
+
+	import vyatta-security-v1 {
+		prefix security;
+	}
+	import vyatta-interfaces-v1 {
+		prefix if;
+	}
+	import configd-v1 {
+		prefix configd;
+	}
+
+	organization "AT&T Inc.";
+	contact
+		"AT&T
+		 Postal: 208 S. Akard Street
+		         Dallas, TX 25202
+		 Web: www.att.com";
+
+	description
+		"Copyright (c) 2017-2019, AT&T Intellectual Property.
+		 All rights reserved.
+
+		 Redistribution and use in source and binary forms, with or without
+		 modification, are permitted provided that the following conditions
+		 are met:
+
+		 1. Redistributions of source code must retain the above copyright
+		    notice, this list of conditions and the following disclaimer.
+		 2. Redistributions in binary form must reproduce the above
+		    copyright notice, this list of conditions and the following
+		    disclaimer in the documentation and/or other materials provided
+		    with the distribution.
+		 3. Neither the name of the copyright holder nor the names of its
+		    contributors may be used to endorse or promote products derived
+		    from this software without specific prior written permission.
+
+		 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+		 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+		 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+		 FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		 COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+		 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+		 BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+		 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+		 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+		 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+		 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		 POSSIBILITY OF SUCH DAMAGE.
+
+		 SPDX-License-Identifier: BSD-3-Clause
+
+		 The YANG module for the SSH client";
+
+	revision 2018-12-13 {
+		description "Add CLI to support SSH client legacy algorithms";
+	}
+
+	revision 2018-09-26 {
+		description "Add CLI to support SSH legacy algorithms";
+	}
+
+	revision 2017-12-15 {
+		description "Initial revision of version 1.";
+	}
+
+	feature ssh-legacy {
+		description "Permit SSH legacy parameters";
+	}
+
+	augment /security:security {
+		container ssh-client {
+			description "SSH client configuration";
+			configd:help "SSH client configuration";
+			configd:priority "900";
+			uses if:source-interface-leaf {
+				refine source-interface {
+					description "Interface used to obtain a source IP address";
+					configd:help "Interface used to obtain a source IP address";
+					configd:update "/opt/vyatta/sbin/vyatta-update-ssh-client update BindInterface $VAR(@)";
+					configd:delete "/opt/vyatta/sbin/vyatta-update-ssh-client delete BindInterface";
+				}
+			}
+			container permit {
+				if-feature ssh-legacy;
+				configd:help "Enable legacy parameters";
+				description "Enable legacy parameters";
+				configd:update "/opt/vyatta/sbin/vyatta-update-ssh-client update Legacy $VAR(@)";
+				configd:delete "/opt/vyatta/sbin/vyatta-update-ssh-client delete Legacy";
+
+				leaf-list host-key-algorithm {
+					configd:help "Host key algorithm";
+					description "Host key algorithm";
+					type enumeration {
+						enum ssh-dss {
+							configd:help "SSH DSS";
+						}
+					}
+				}
+
+				leaf-list key-exchange-algorithm {
+					configd:help "Key Exchange algorithm";
+					description "Key Exchange algorithm";
+					type enumeration {
+						enum diffie-hellman-group1-sha1 {
+							configd:help "Diffie-Hellman group 1 SHA1";
+						}
+						enum diffie-hellman-group14-sha1 {
+							configd:help "Diffie-Hellman group 14 SHA1";
+						}
+						enum diffie-hellman-group-exchange-sha1 {
+							configd:help "Diffie-Hellman group exchange SHA1";
+						}
+					}
+				}
+			}
+		}
+	}
+}

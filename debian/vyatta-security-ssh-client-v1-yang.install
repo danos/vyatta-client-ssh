@@ -1,0 +1,3 @@
+yang/vyatta-security-ssh-client-v1.yang usr/share/configd/yang
+scripts/vyatta-update-ssh-client opt/vyatta/sbin
+scripts/vyatta-security-ssh-client-update opt/vyatta/sbin

@@ -1,0 +1,2 @@
+yang/vyatta-security-ssh-known-hosts-routing-instance-v1.yang usr/share/configd/yang
+tmplscripts/security/ssh-known-hosts/configd_vrf_end.sh opt/vyatta/share/tmplscripts/security/ssh-known-hosts/

@@ -1,0 +1,2 @@
+#!/opt/vyatta/bin/cliexpr
+syntax:expression: exec "tmpfile=$(mktemp); echo '$VAR(../@)' '$VAR(@)' >| $tmpfile;   result=1;   fingerprint=$(ssh-keygen -q -lf $tmpfile 2> /dev/null);   if [[ $? -eq 0 ]]; then      echo Adding key for '$VAR(../@)' with fingerprint:;      echo $fingerprint;      result=0;   fi;   rm -f $tmpfile;   exit $result" ; "Invalid public key"

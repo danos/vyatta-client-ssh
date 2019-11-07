@@ -1,0 +1,104 @@
+module vyatta-security-ssh-known-hosts-v1 {
+	namespace "urn:vyatta.com:mgmt:vyatta-ssh-known-hosts:1";
+	prefix vyatta-security-ssh-known-hosts-v1;
+
+	import vyatta-security-v1 {
+		prefix security;
+	}
+	import configd-v1 {
+		prefix configd;
+	}
+
+	organization "AT&T Inc.";
+	contact
+		"AT&T
+		 Postal: 208 S. Akard Street
+		         Dallas, TX 25202
+		 Web: www.att.com";
+
+	description
+		"Copyright (c) 2019, AT&T Intellectual Property.
+		 All rights reserved.
+
+		 Copyright (c) 2016 by Brocade Communication Systems, Inc.
+		 All rights reserved.
+
+		 Redistribution and use in source and binary forms, with or without
+		 modification, are permitted provided that the following conditions
+		 are met:
+
+		 1. Redistributions of source code must retain the above copyright
+		    notice, this list of conditions and the following disclaimer.
+		 2. Redistributions in binary form must reproduce the above
+		    copyright notice, this list of conditions and the following
+		    disclaimer in the documentation and/or other materials provided
+		    with the distribution.
+		 3. Neither the name of the copyright holder nor the names of its
+		    contributors may be used to endorse or promote products derived
+		    from this software without specific prior written permission.
+
+		 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+		 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+		 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+		 FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		 COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+		 INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+		 BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+		 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+		 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+		 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+		 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		 POSSIBILITY OF SUCH DAMAGE.
+
+		 SPDX-License-Identifier: BSD-3-Clause
+
+		 SSH known hosts configuration";
+
+	revision 2016-02-24 {
+		description "Use a grouping. This is needed for the routing-instance upgrade.";
+	}
+	revision 2015-08-14 {
+		description "Initial revision of version 1.";
+	}
+
+	grouping ssh-known-host {
+		container ssh-known-hosts {
+			presence "true";
+			configd:help "SSH known, trusted hosts";
+			list host {
+				configd:help "Host name or IP of trusted remote host";
+				configd:validate "/opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/configd_validate1.cli";
+				key "tagnode";
+				description "Host name or IP of trusted remote host";
+				leaf tagnode {
+					type string;
+					configd:help "Host name or IP of remote trusted host";
+				}
+				leaf key {
+					type string {
+						configd:syntax "/opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/key/configd_syntax1.cli";
+					}
+					configd:help "Public key for host";
+				}
+				leaf load-from-file {
+					type string;
+					configd:help "Load public key from file";
+					configd:subst "/opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/load-from-file/configd_subst1.cli";
+				}
+				leaf fetch-from-server {
+					type empty;
+					configd:help "Query remote server for public key";
+					configd:subst "/opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/fetch-from-server/configd_subst1.cli";
+				}
+			}
+		}
+	}
+
+	augment /security:security {
+		uses ssh-known-host {
+			refine ssh-known-hosts {
+				configd:end "/opt/vyatta/share/tmplscripts/security/ssh-known-hosts/configd_end.sh default";
+			}
+		}
+	}
+}
