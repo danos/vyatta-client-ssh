@@ -23,16 +23,18 @@ case $COMMIT_ACTION in
 
     *)
         if [[ $VRFName == "default" ]]; then
-            for h in $VAR(./host/@@); do
-                k=$(cli-shell-api returnValue security ssh-known-hosts host $h key)
+            IFS=' ' read -a hosts <<< '$VAR(./host/@@)'
+            for h in "${hosts[@]}"; do
+                k=$(cli-shell-api returnValue security ssh-known-hosts host "$h" key)
                 if [[ -n "$k" ]]; then
                     mkdir -p /run/ssh/vrf/$VRFName
                     echo "$h" "$k" >> /run/ssh/vrf/$VRFName/ssh_known_hosts
                 fi
             done
         else
-            for h in $VAR(./host/@@); do
-                k=$(cli-shell-api returnValue routing routing-instance $VRFName security ssh-known-hosts host $h key)
+            IFS=' ' read -a hosts <<< '$VAR(./host/@@)'
+            for h in "${hosts[@]}"; do
+                k=$(cli-shell-api returnValue routing routing-instance $VRFName security ssh-known-hosts host "$h" key)
                 if [[ -n "$k" ]]; then
                     mkdir -p /run/ssh/vrf/$VRFName
                     echo "$h" "$k" >> /run/ssh/vrf/$VRFName/ssh_known_hosts

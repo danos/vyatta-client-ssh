@@ -1,9 +1,10 @@
 #!/opt/vyatta/bin/cliexec
 >| /etc/ssh/ssh_known_hosts
-for h in $VAR(./host/@@); do
-    k=$(cli-shell-api returnValue security ssh-known-hosts host $h key)
+IFS=' ' read -a hosts <<< '$VAR(./host/@@)'
+for h in "${hosts[@]}"; do
+    k=$(cli-shell-api returnValue security ssh-known-hosts host "$h" key)
     if [[ -n "$k" ]]; then
-	echo "$h" $k >> /etc/ssh/ssh_known_hosts
+	echo "$h $k" >> /etc/ssh/ssh_known_hosts
     fi
 done
 
