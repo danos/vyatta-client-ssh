@@ -1,3 +1,9 @@
+vyatta-client-ssh (0.9) unstable; urgency=medium
+
+  * ssh-known-hosts CLI should handle hashed hostnames
+
+ -- Mike Manning <mmanning@vyatta.att-mail.com>  Fri, 12 Jun 2020 18:50:36 +0100
+
 vyatta-client-ssh (0.8) unstable; urgency=medium
 
   * DANOS Import
