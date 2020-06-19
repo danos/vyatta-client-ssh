@@ -1,0 +1,119 @@
+#! /usr/bin/perl
+#
+# Copyright (c) 2020, AT&T Intellectual Property. All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+use strict;
+use warnings;
+use lib '/opt/vyatta/share/perl5';
+use URI::Encode qw(uri_decode);
+use Vyatta::Configd;
+use Vyatta::SSHClient;
+
+my ( $rtcfg, $host, $action, $loadfile, $rtdomain );
+my $known_hosts_file = $SSH_KNOWN_HOSTS;
+my $cmdprefix        = "";
+my $is_hashed        = 0;
+
+my %actions = ( "fetch-from-server" => 1, "load-from-file" => 1 );
+
+my $configd_path = $ENV{'CONFIGD_PATH'}
+  or die "CONFIGD_PATH not in environment";
+
+if ( $configd_path =~ "(.*)/security/ssh-known-hosts/host/([^/]+)/([^/]+)(.*)" )
+{
+    $rtcfg    = $1;
+    $host     = uri_decode $2;
+    $action   = $3;
+    $loadfile = uri_decode $4;
+
+    die "Unrecognized action '$action'" unless exists $actions{$action};
+
+    $is_hashed = 1 if $host =~ /^\|.*/;
+    $loadfile =~ s/^\/// if $loadfile;
+
+    if ($rtcfg) {
+        die "Unrecognized RT config '$rtcfg'"
+          unless $rtcfg =~ /\/routing\/routing-instance\/(.*)/;
+        $rtdomain         = uri_decode $1;
+        $cmdprefix        = "/usr/sbin/chvrf '$1' ";
+        $known_hosts_file = "/run/ssh/vrf/$rtdomain/ssh_known_hosts";
+    }
+} else {
+    die "CONFIGD_PATH in wrong format";
+}
+
+my $sid = $ENV{'VYATTA_CONFIG_SID'}
+  or die "VYATTA_CONFIG_SID not in environment";
+
+my $cfg_client = Vyatta::Configd::Client->new();
+die "Unable to connect to the Vyatta Configuration Daemon"
+  unless defined($cfg_client);
+
+$cfg_client->session_attach("$sid");
+die "Configuration session does not exist"
+  unless $cfg_client->session_exists();
+
+my @key_entries;
+
+if ( "$action" eq "fetch-from-server" ) {
+
+    die "Unable to fetch from server, host is hashed\n" if $is_hashed;
+    my $key_req = join( ",", @SSH_KEY_TYPES );
+    @key_entries =
+      qx(${cmdprefix}/usr/bin/ssh-keyscan -H -t '$key_req' '$host' 2>/dev/null)
+      or exit 0;
+    chomp(@key_entries);
+
+} elsif ( "$action" eq "load-from-file" ) {
+
+    die "Invalid file path\n" unless -f $loadfile;
+
+    # Legacy load-file expects a file with a single entry, and uses cfg'd host.
+    # The following allows known hosts using hashes to be provided.
+    my $fp_output = qx(/usr/bin/ssh-keygen -l -f '$loadfile' -F '$host');
+    my $linenum   = 1;
+    my ( $key_entry, $found, $more );
+
+    if ( $fp_output =~ /(.*)found: line (\d+)(.*)/ ) {
+        $linenum = $2;
+        $found   = 1;
+    }
+
+    ( $key_entry, $more ) = ssh_get_line( $loadfile, $linenum );
+
+    if ( !$found ) {
+        die "File must have single entry if no host match\n" if $more;
+        $key_entry =~ s/^([^\s]*)/$host/;
+    }
+
+    qx(echo '$key_entry' | ssh-keygen -l -f -) or die "Invalid file format\n";
+
+    @key_entries = ($key_entry);
+}
+
+my ( $key_entry, $stored_fp_str, $stored_fp_key_type ) =
+  ssh_key_select( $known_hosts_file, $host, @key_entries );
+exit 0 unless $key_entry;
+
+my ( $hash, $key_type, $pub_key ) = split / /, $key_entry;
+
+if ($stored_fp_str) {
+    my $host_to_delete;
+    if ( -f $known_hosts_file ) {
+        $host_to_delete =
+          ssh_get_host_to_delete( $known_hosts_file, $host, $stored_fp_str );
+    }
+
+    # The entry in the ssh_known_hosts file was changed under us
+    die "Config not updated due to a concurrent change, please retry\n"
+      unless $host_to_delete;
+
+    if ( $host_to_delete ne $hash ) {
+        ssh_delete_config( $cfg_client, $host_to_delete, $rtdomain );
+    }
+}
+
+ssh_set_config( $cfg_client, $hash, $key_type, $pub_key, $rtdomain );

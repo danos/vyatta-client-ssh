@@ -1,6 +1,0 @@
-#!/opt/vyatta/bin/cliexpr
-sub:expression: $VAR(../key/@) = `if [[ "$VAR(../../../../../@)" == "routing" ]]; then \
-                                    /usr/sbin/chvrf '$VAR(../../../../@)' /usr/bin/ssh-keyscan -t rsa '$VAR(../@)' | awk '{printf("%s %s", $2, $3);}'; \
-                                 else \
-                                    /usr/bin/ssh-keyscan -t rsa '$VAR(../@)' | awk '{printf("%s %s", $2, $3);}'; \
-                                 fi;`

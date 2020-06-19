@@ -17,7 +17,7 @@ module vyatta-security-ssh-known-hosts-v1 {
 		 Web: www.att.com";
 
 	description
-		"Copyright (c) 2019, AT&T Intellectual Property.
+		"Copyright (c) 2019-2020, AT&T Intellectual Property.
 		 All rights reserved.
 
 		 Copyright (c) 2016 by Brocade Communication Systems, Inc.
@@ -54,6 +54,9 @@ module vyatta-security-ssh-known-hosts-v1 {
 
 		 SSH known hosts configuration";
 
+	revision 2020-06-19 {
+		description "Update ssh-known-hosts generator scripts to use host hash";
+	}
 	revision 2016-02-24 {
 		description "Use a grouping. This is needed for the routing-instance upgrade.";
 	}
@@ -83,12 +86,12 @@ module vyatta-security-ssh-known-hosts-v1 {
 				leaf load-from-file {
 					type string;
 					configd:help "Load public key from file";
-					configd:subst "/opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/load-from-file/configd_subst1.cli";
+					configd:subst "/opt/vyatta/sbin/vyatta-ssh-known-hosts-update";
 				}
 				leaf fetch-from-server {
 					type empty;
 					configd:help "Query remote server for public key";
-					configd:subst "/opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/fetch-from-server/configd_subst1.cli";
+					configd:subst "/opt/vyatta/sbin/vyatta-ssh-known-hosts-update";
 				}
 			}
 		}
