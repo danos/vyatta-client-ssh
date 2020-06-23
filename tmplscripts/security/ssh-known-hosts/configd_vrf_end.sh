@@ -22,6 +22,7 @@ case $COMMIT_ACTION in
         ;;
 
     *)
+        rm -f /run/ssh/vrf/$VRFName/ssh_known_hosts
         if [[ $VRFName == "default" ]]; then
             IFS=' ' read -a hosts <<< '$VAR(./host/@@)'
             for h in "${hosts[@]}"; do
