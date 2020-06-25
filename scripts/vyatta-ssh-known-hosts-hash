@@ -1,0 +1,47 @@
+#! /usr/bin/perl
+#
+# Copyright (c) 2020, AT&T Intellectual Property. All rights reserved.
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+use strict;
+use warnings;
+use lib '/opt/vyatta/share/perl5';
+use Vyatta::SSHClient;
+
+sub usage {
+    die "usage: $0 <hostname or IP> [<routing-instance>]\n";
+}
+
+sub is_valid_str {
+    my $str = shift;
+    return ( length($str) < 256 and $str =~ /^[a-z0-9:_\-\.]*$/i );
+}
+
+my $host    = $ARGV[0];
+my $ri_name = $ARGV[1];
+usage() unless $host;
+
+die "host '$host' contains unusual characters or is too long\n"
+  unless is_valid_str($host);
+
+die "routing instance '$ri_name' contains unusual characters or is too long\n"
+  unless !$ri_name or is_valid_str($ri_name);
+
+my $known_hosts_file = $SSH_KNOWN_HOSTS;
+my $host_str         = "'$host'";
+
+if ($ri_name) {
+    $known_hosts_file = "/run/ssh/vrf/$ri_name/ssh_known_hosts";
+    $host_str .= " in '$ri_name'";
+}
+
+die "no file for ssh known hosts found for $host_str\n" unless -f $known_hosts_file;
+
+my $host_to_delete =
+  ssh_get_host_to_delete( $known_hosts_file, $host );
+
+die "no entry found for $host_str\n" unless $host_to_delete;
+
+print "$host_to_delete";

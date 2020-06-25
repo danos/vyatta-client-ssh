@@ -1,5 +1,7 @@
+yang/vyatta-op-show-ssh-known-hosts-v1.yang usr/share/configd/yang/
 yang/vyatta-security-ssh-known-hosts-v1.yang usr/share/configd/yang/
 lib/SSHClient.pm /opt/vyatta/share/perl5/Vyatta/
+scripts/vyatta-ssh-known-hosts-hash opt/vyatta/sbin/
 scripts/vyatta-ssh-known-hosts-update opt/vyatta/sbin/
 tmplscripts/security/ssh-known-hosts/configd_end.sh /opt/vyatta/share/tmplscripts/security/ssh-known-hosts/
 tmplscripts/security/ssh-known-hosts/host/configd_validate1.cli /opt/vyatta/share/tmplscripts/security/ssh-known-hosts/host/
