@@ -1,3 +1,11 @@
+vyatta-client-ssh (0.10) unstable; urgency=medium
+
+  * ssh-known-hosts hostname or IP address should be hashed
+  * ssh-known-hosts vrf config must remove deleted entries from ssh_known_hosts
+  * ssh-known-hosts: allow deletion using clear-text hostname/IP
+
+ -- Mike Manning <mmanning@vyatta.att-mail.com>  Thu, 02 Jul 2020 09:02:25 +0100
+
 vyatta-client-ssh (0.9) unstable; urgency=medium
 
   * ssh-known-hosts CLI should handle hashed hostnames
