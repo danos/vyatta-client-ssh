@@ -4,4 +4,4 @@
 #
 
 %:
-	dh $@ --with=systemd --with=yang
+	dh $@ --with=yang

@@ -2,7 +2,7 @@ Source: vyatta-client-ssh
 Section: contrib/net
 Priority: optional
 Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
-Build-Depends: cpio, debhelper (>= 9), dh-systemd (>= 1.5), dh-yang
+Build-Depends: cpio, debhelper-compat (= 12), dh-yang
 Standards-Version: 3.9.6
 
 Package: vyatta-security-ssh-client-v1-yang
